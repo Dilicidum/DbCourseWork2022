@@ -37,10 +37,16 @@ namespace WebApplication1.Controllers
             return Ok(list);
         }
 
-        [HttpPost]
+        [HttpPost("Tasks")]
         public async Task<IActionResult> AddTask(Tasks Task)
         {
             var res = await context.Tasks.AddAsync(Task);
+            return Ok(res);
+        }
+
+        public async Task<IActionResult> GetTasks()
+        {
+            var res = await context.Tasks.ToListAsync();
             return Ok(res);
         }
     }

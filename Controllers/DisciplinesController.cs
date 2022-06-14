@@ -23,6 +23,19 @@ namespace WebApplication1.Controllers
             return res;
         }
 
+        [HttpGet("{disciplineId}")]
+        public async Task<IActionResult> GetDisciplinesAsync(int disciplineId)
+        {
+            var res = await context.Disciplines.Include(x=>x.Groups).ThenInclude(x=>x.Tutor).SingleOrDefaultAsync(x=>x.Id == disciplineId);
+
+            if(res == null)
+            {
+                return BadRequest("no such object with id");
+            }
+
+            return Ok(res);
+        }
+
         [HttpGet("DisciplineWithGroupss")]
         public async Task<IActionResult> GetDisciplineWithGroupssAsync()
         {
@@ -34,8 +47,41 @@ namespace WebApplication1.Controllers
         public async Task<IActionResult> AddDiscipline(Discipline discipline)
         {
             var res = await context.AddAsync(discipline);
+            await context.SaveChangesAsync();
+            return Ok();
+        }
 
-            return Ok(res);
+        [HttpPut("{disciplineId}")]
+        public async Task<IActionResult> UpdateDiscipline(int disciplineId,[FromBody] Discipline bodyToUpdate)
+        {
+            var discipline = await context.Disciplines.SingleOrDefaultAsync(x => x.Id == disciplineId);
+
+            if(discipline == null)
+            {
+                return BadRequest("no such object with selected Id");
+            }
+
+            discipline.Name = bodyToUpdate.Name;
+
+            await context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDiscipline(int id)
+        {
+            var discipline = await context.Disciplines.SingleOrDefaultAsync(x=>x.Id == id);
+
+            if(discipline == null)
+            {
+                return BadRequest("No such object with Id");
+            }
+
+            context.Disciplines.Remove(discipline);
+            await context.SaveChangesAsync();
+
+            return Ok();
         }
     }
 }

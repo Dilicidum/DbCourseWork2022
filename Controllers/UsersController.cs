@@ -24,11 +24,12 @@ namespace WebApplication1.Controllers
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetUsersById(int Id)
         {
-            var res = await context.Users.FirstOrDefaultAsync(x=>x.Id == Id);
+            var res = await context.Users.Include(x=>x.Groups).ThenInclude(x=>x.Tutor).FirstOrDefaultAsync(x=>x.Id == Id);
             if(res == null)
             {
                 return NotFound();
             }
+
             return Ok(res);
         }
 
@@ -41,18 +42,40 @@ namespace WebApplication1.Controllers
             }
 
             var res = await context.AddAsync(user);
+            await context.SaveChangesAsync();
 
-            return Ok(res);
+            return Ok("User created");
         }
 
-        [HttpDelete]
+        [HttpPut("{userId}")]
+        public async Task<IActionResult> Update(int userId, User user)
+        {
+            var userToUpdate = await context.Users.SingleOrDefaultAsync(x => x.Id == userId);
+
+            if(userToUpdate == null)
+            {
+                return NotFound();
+            }
+
+            userToUpdate.FirstName = user.FirstName;
+            userToUpdate.LastName = user.LastName;
+            userToUpdate.Login = user.Login;
+
+            //context.Users.Update(userToUpdate);
+            await context.SaveChangesAsync();
+
+            return Ok("User updated");
+        }
+
+        [HttpDelete("{Id}")]
         public async Task<IActionResult> DeleteUser(int Id)
         {
             var entity = await context.Users.FirstOrDefaultAsync(x=>x.Id == Id);
             if(entity != null)
             {
                 var res = context.Users.Remove(entity);
-                return Ok(res);
+                await context.SaveChangesAsync();
+                return Ok("User deleted");
             }
             return NotFound();
         }

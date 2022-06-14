@@ -78,10 +78,10 @@ namespace WebApplication1
                 j => j
                     .HasOne(pt => pt.Task)
                     .WithMany(p => p.StudentTasks)
-                    .HasForeignKey(pt => pt.TaskId),
+                    .HasForeignKey(pt => pt.TasksId),
                 j =>
                 {
-                    j.HasKey(t => new { t.TaskId, t.StudentId });
+                    j.HasKey(t => new { t.TasksId, t.StudentId });
                 });
 
 

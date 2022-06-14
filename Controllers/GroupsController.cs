@@ -26,6 +26,7 @@ namespace WebApplication1.Controllers
         public async Task<IActionResult> AddGroup(Group group)
         {
             var res = await context.Groups.AddAsync(group);
+            await context.SaveChangesAsync();
             return Ok(res);
         }
     }
